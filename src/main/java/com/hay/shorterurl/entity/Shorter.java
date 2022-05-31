@@ -17,10 +17,13 @@ public class Shorter {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
+
 	@Column
 	private String hash;
+
 	@Column(name = "original_url")
 	private String originalUrl;
+
 	@Column(name = "created_at", columnDefinition = "TIMESTAMP")
 	private ZonedDateTime createdAt;
 }

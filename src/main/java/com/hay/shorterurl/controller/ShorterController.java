@@ -24,6 +24,7 @@ public class ShorterController {
 
 	private final ShorterRepository repository;
 	private CodeGenerator codeGenerator;
+
 	@Value("${shorter.length}")
 	private Integer shorterLength;
 
@@ -33,15 +34,15 @@ public class ShorterController {
 		this.codeGenerator = new CodeGenerator();
 	}
 
-	@PostMapping(path = "/", consumes = APPLICATION_JSON_VALUE)
-	public Shorter createShortUrl(@RequestBody Shorter shorter) {
+	@PostMapping(path = "/")
+	public ResponseEntity createShortUrl(@RequestBody Shorter shorter) {
 		String hash = codeGenerator.generate(shorterLength);
 		logger.info(hash);
 		if (shorter != null) {
 			String shorterString = URLDecoder.decode(shorter.getOriginalUrl());
 			logger.info(shorterString);
 			shorter = new Shorter(null, hash, shorterString, ZonedDateTime.now());
-			return repository.save(shorter);
+			return ResponseEntity.ok(repository.save(shorter));
 		} else {
 			return null;
 		}
