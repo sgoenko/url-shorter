@@ -21,9 +21,9 @@ public class Shorter {
 	@Column
 	private String hash;
 
-	@Column(name = "original_url")
+	@Column
 	private String originalUrl;
 
-	@Column(name = "created_at", columnDefinition = "TIMESTAMP")
+	@Column(columnDefinition = "TIMESTAMP")
 	private ZonedDateTime createdAt;
 }
