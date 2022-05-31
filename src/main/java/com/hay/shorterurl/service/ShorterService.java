@@ -8,9 +8,9 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.net.URLDecoder;
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -29,11 +29,12 @@ public class ShorterService {
 	public Shorter addHash(Shorter shorter) {
 		String hash = RandomStringUtils.randomAlphanumeric(shorterLength);
 		log.info(hash);
+		log.info(shorter.getOriginalUrl());
 
-		String shorterString = URLDecoder.decode(shorter.getOriginalUrl());
-		log.info(shorterString);
-		shorter = new Shorter(null, hash, shorterString, ZonedDateTime.now());
-		return repository.save(shorter);
+		Optional<Shorter> savedShorter = repository.findByOriginalUrl(shorter.getOriginalUrl());
+
+		return savedShorter.orElseGet(() -> repository.save(
+				new Shorter(null, hash, shorter.getOriginalUrl(), ZonedDateTime.now())));
 	}
 
 	public List<Shorter> getAll() {
