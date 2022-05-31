@@ -2,7 +2,9 @@ package com.hay.shorterurl.controller;
 
 import com.hay.shorterurl.entity.Shorter;
 import com.hay.shorterurl.repository.ShorterRepository;
+import com.hay.shorterurl.service.ShorterService;
 import com.hay.shorterurl.util.CodeGenerator;
+import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,43 +17,21 @@ import org.springframework.web.bind.annotation.*;
 import java.net.URLDecoder;
 import java.time.ZonedDateTime;
 
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-
 @RestController
 @RequestMapping
+@AllArgsConstructor
 public class ShorterController {
-	Logger logger = LoggerFactory.getLogger(ShorterController.class.getSimpleName());
-
-	private final ShorterRepository repository;
-	private CodeGenerator codeGenerator;
-
-	@Value("${shorter.length}")
-	private Integer shorterLength;
-
-	@Autowired
-	public ShorterController(final ShorterRepository repository) {
-		this.repository = repository;
-		this.codeGenerator = new CodeGenerator();
-	}
+	private final ShorterService shorterService;
 
 	@PostMapping(path = "/")
 	public ResponseEntity createShortUrl(@RequestBody Shorter shorter) {
-		String hash = codeGenerator.generate(shorterLength);
-		logger.info(hash);
-		if (shorter != null) {
-			String shorterString = URLDecoder.decode(shorter.getOriginalUrl());
-			logger.info(shorterString);
-			shorter = new Shorter(null, hash, shorterString, ZonedDateTime.now());
-			return ResponseEntity.ok(repository.save(shorter));
-		} else {
-			return null;
-		}
+		shorter = shorterService.addHash(shorter);
+		return ResponseEntity.ok(shorterService.addHash(shorter));
 	}
 
 	@GetMapping(path = "/{hash}")
 	public ResponseEntity redirectShorter(@PathVariable("hash") String hash) {
-		logger.info(hash);
-		Shorter shorter = repository.findByHash(hash);
+		Shorter shorter = shorterService.getByHash(hash);
 		if (shorter != null) {
 			HttpHeaders headers = new HttpHeaders();
 			headers.add("Location", shorter.getOriginalUrl());
@@ -63,7 +43,7 @@ public class ShorterController {
 
 	@GetMapping
 	public ResponseEntity getAll() {
-		return ResponseEntity.ok(repository.findAll());
+		return ResponseEntity.ok(shorterService.getAll());
 	}
 
 }

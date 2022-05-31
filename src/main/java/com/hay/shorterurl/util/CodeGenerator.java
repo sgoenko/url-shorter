@@ -1,7 +1,9 @@
 package com.hay.shorterurl.util;
 
 import org.apache.commons.text.RandomStringGenerator;
+import org.springframework.stereotype.Component;
 
+@Component
 public class CodeGenerator {
 	private RandomStringGenerator randomStringGenerator;
 
